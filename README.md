@@ -1,4 +1,4 @@
-项目地址：[https://github.com/PeachBlossom/treader](https://github.com/PeachBlossom/treader)
+项目地址：[https://github.com/c2016bb/TxtRreader](https://github.com/c2016bb/TxtRreader)
 
 分享下之前写的小说阅读器，项目结构是传统mvc这样来做，欢迎大家star。
 
@@ -24,4 +24,4 @@
 
 ![S61202-093825.jpg](http://upload-images.jianshu.io/upload_images/1940874-495a30138522cb0a.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/280)
 
-项目地址：[https://github.com/PeachBlossom/treader](https://github.com/PeachBlossom/treader)
+项目地址：[https://github.com/c2016bb/TxtRreader](https://github.com/c2016bb/TxtRreader)
