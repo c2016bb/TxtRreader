@@ -84,7 +84,7 @@ public class TxtReader{
         LitePal.initialize(context);
         Config.createConfig(context);
         PageFactory.createPageFactory(context);
-        initialEnv();
+//        initialEnv();
     }
 
     public String getTTPath(){

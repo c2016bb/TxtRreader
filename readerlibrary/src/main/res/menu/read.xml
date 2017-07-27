@@ -15,7 +15,7 @@
         android:id="@+id/action_read_book"
         android:title="@string/action_read_book"
         android:orderInCategory="90"
-        app:showAsAction="ifRoom" />
-
-
+        app:showAsAction="ifRoom"
+        android:visible="false"
+        />
 </menu>

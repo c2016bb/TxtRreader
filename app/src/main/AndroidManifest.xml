@@ -54,6 +54,8 @@
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+
+
         <activity
             android:name="com.txt.readerlibrary.FileActivity"
             android:label="@string/app_name"
@@ -83,6 +85,9 @@
         <activity
             android:name="com.txt.readerlibrary.MarkActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+
+
+
         <!-- <activity -->
         <!-- android:name="com.umeng.fb.ConversationActivity"/> -->
 
