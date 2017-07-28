@@ -22,6 +22,8 @@ import com.txt.readerlibrary.Config;
 import com.txt.readerlibrary.R;
 import com.txt.readerlibrary.db.BookCatalogue;
 import com.txt.readerlibrary.db.BookList;
+import com.txt.readerlibrary.utils.DownLoadFile;
+import com.txt.readerlibrary.utils.LogUtils;
 import com.txt.readerlibrary.view.PageWidget;
 
 import org.litepal.crud.DataSupport;
@@ -129,7 +131,7 @@ public class PageFactory {
     private float currentProgress;
     //目录
 //    private List<BookCatalogue> directoryList = new ArrayList<>();
-    //书本路径
+//    //书本路径
     private String bookPath = "";
     //书本名字
     private String bookName = "";
@@ -139,6 +141,11 @@ public class PageFactory {
     //当前电量
     private int level = 0;
     private BookUtil mBookUtil;
+
+    private boolean isNetUrl;
+    private  String txtUrl;
+
+
     private PageEvent mPageEvent;
 
     private TRPage currentPage;
@@ -441,9 +448,16 @@ public class PageFactory {
         initBg(config.getDayOrNight());//设计 日渐或夜间模式
 
         this.bookList = bookList;
-        bookPath = bookList.getBookpath();
-        bookName = FileUtils.getFileName(bookPath);
+//        bookPath = bookList.getBookpath();
+        this.isNetUrl=bookList.isNetUrl();
 
+        if (bookList.isNetUrl()) {
+            this.txtUrl=bookList.getTxtUrl();
+            bookName = DownLoadFile.getUrlName(bookList.getTxtUrl());
+        }else{
+            bookPath=bookList.getBookpath();
+            bookName = FileUtils.getFileName(bookPath);
+        }
         mStatus = Status.OPENING; //打开状态
 
         drawStatus(mBookPageWidget.getCurPage());
@@ -495,7 +509,7 @@ public class PageFactory {
         @Override
         protected Boolean doInBackground(Long... params) {
             begin = params[0];
-            Log.i(TAG,"begin--->"+begin);
+            LogUtils.D("begin--->"+begin);
             try {
                 mBookUtil.openBook(bookList);
             } catch (Exception e) {
@@ -822,8 +836,14 @@ public class PageFactory {
         currentPage(false);
     }
 
+    public boolean isNetUrl() {
+        return isNetUrl;
+    }
+
     public void clear(){
         currentCharter = 0;
+        isNetUrl=true;
+        txtUrl="";
         bookPath = "";
         bookName = "";
         bookList = null;
@@ -854,6 +874,13 @@ public class PageFactory {
     public String getBookPath(){
         return bookPath;
     }
+    public  String getTxtUrl(){
+        return txtUrl;
+    }
+
+
+
+
     //是否是第一页
     public boolean isfirstPage() {
         return m_isfirstPage;

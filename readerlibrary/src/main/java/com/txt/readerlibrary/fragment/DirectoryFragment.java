@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.txt.readerlibrary.R;
+import com.txt.readerlibrary.TxtReader;
 import com.txt.readerlibrary.base.BaseFragmentAdapter;
 import com.txt.readerlibrary.db.BookList;
 import com.txt.readerlibrary.util.FileUtils;
@@ -328,6 +329,7 @@ public class DirectoryFragment extends Fragment{
                 String bookName = FileUtils.getFileName(item.thumb);
                 bookList.setBookname(bookName);
                 bookList.setBookpath(item.thumb);
+                bookList.setNetUrl(false);
                 bookLists.add(bookList);
             }
             SaveBookToSqlLiteTask mSaveBookToSqlLiteTask = new SaveBookToSqlLiteTask();
@@ -398,6 +400,7 @@ public class DirectoryFragment extends Fragment{
                     bookLists = DataSupport.findAll(BookList.class);
                     listAdapter.notifyDataSetChanged();
                     changgeCheckBookNum();
+                    TxtReader.getTxtReader().openBookByFilePath(bookLists.get(0).getBookpath(),getActivity());
                     break;
                 case REPEAT:
                     msg = "书本" + repeatBookList.getBookname() + "重复了";
@@ -642,6 +645,7 @@ public class DirectoryFragment extends Fragment{
                 BookList bookList = new BookList();
                 String bookName = FileUtils.getFileName(path);
                 bookList.setBookname(bookName);
+                bookList.setNetUrl(false);
                 bookList.setBookpath(path);
 
                 boolean isSave = false;
@@ -773,7 +777,6 @@ public class DirectoryFragment extends Fragment{
                     return true;
                 }
             }
-
             return false;
         }
     }

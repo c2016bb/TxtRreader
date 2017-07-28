@@ -10,6 +10,15 @@ public class BookCatalogue extends DataSupport {
     private String bookpath;
     private String bookCatalogue;
     private long bookCatalogueStartPos;
+    private String bookUrl;
+
+    public String getBookUrl() {
+        return bookUrl;
+    }
+
+    public void setBookUrl(String bookUrl) {
+        this.bookUrl = bookUrl;
+    }
 
     public int getId() {
         return id;

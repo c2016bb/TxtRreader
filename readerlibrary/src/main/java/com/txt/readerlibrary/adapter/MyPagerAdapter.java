@@ -18,10 +18,12 @@ public class MyPagerAdapter extends FragmentPagerAdapter {
     private BookMarkFragment bookMarkFragment;
     private String bookPath;
     private final String[] titles = { "目录", "书签" };
+    private  boolean  isNetUrl;
 
-    public MyPagerAdapter(FragmentManager fm,String bookPath) {
+    public MyPagerAdapter(FragmentManager fm,String bookPath,boolean  isNetUrl) {
         super(fm);
         this.bookPath = bookPath;
+        this.isNetUrl=isNetUrl;
     }
 
     @Override
@@ -52,7 +54,7 @@ public class MyPagerAdapter extends FragmentPagerAdapter {
                     //catalogueFragment = new CatalogueFragment();
                   //  catalogueFragment = CatalogueFragment.newInstance(MarkActivity.getBookpath_intent());
 //                    bookMarkFragment = BookMarkFragment.newInstance(MarkActivity.getBookpath_intent());
-                    bookMarkFragment = BookMarkFragment.newInstance(bookPath);
+                    bookMarkFragment = BookMarkFragment.newInstance(bookPath,isNetUrl);
                 }
                 return bookMarkFragment;
         }

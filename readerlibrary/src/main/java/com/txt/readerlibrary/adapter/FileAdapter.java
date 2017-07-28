@@ -9,6 +9,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.txt.readerlibrary.R;
@@ -180,14 +181,14 @@ public  class FileAdapter extends BaseAdapter {
         TextView textView;
         TextView textSize;
         ImageView fileIcon;
-        CheckBox checkBox;
+        RadioButton checkBox;
         LinearLayout linearLayout;
 
         public ViewHolder(View view) {
             textView=(TextView) view.findViewById(R.id.tv_file_text);
             textSize=(TextView) view.findViewById(R.id.tv_file_text_size);
             fileIcon=(ImageView) view.findViewById(R.id.iv_file_icon);
-            checkBox=(CheckBox) view.findViewById(R.id.cb_file_image);
+            checkBox=(RadioButton) view.findViewById(R.id.cb_file_image);
             linearLayout=(LinearLayout) view.findViewById(R.id.ll_file_lin);
 
         }

@@ -2,8 +2,23 @@
     package="com.txt.readerlibrary">
 
     <application android:allowBackup="true" android:label="@string/app_name"
-        android:supportsRtl="true">
+        android:supportsRtl="true"
+        >
+     <activity android:name=".ReadActivity"
+         android:screenOrientation="portrait"
+         android:theme="@style/NoActionBar"
+         />
+        <activity
+            android:name="com.txt.readerlibrary.FileActivity"
+            android:theme="@style/NoActionBar"></activity>
+        <activity
+            android:name="com.txt.readerlibrary.FileChooserActivity"
+            android:theme="@style/NoActionBar"></activity>
 
+        <activity
+            android:name="com.txt.readerlibrary.MarkActivity"
+            android:theme="@style/NoActionBar"></activity>
     </application>
+
 
 </manifest>

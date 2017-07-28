@@ -34,7 +34,7 @@ public class TestActivity extends AppCompatActivity {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                TxtReader.getTxtReader().openBook(url,TestActivity.this);
+                TxtReader.getTxtReader().openBookByUrl(url,TestActivity.this);
             }
         });
     }

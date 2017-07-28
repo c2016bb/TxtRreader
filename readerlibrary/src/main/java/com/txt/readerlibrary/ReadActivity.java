@@ -6,8 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.database.SQLException;
 import android.graphics.Point;
 import android.graphics.Typeface;
@@ -32,18 +30,15 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.baidu.tts.auth.AuthInfo;
-import com.baidu.tts.client.SpeechError;
-import com.baidu.tts.client.SpeechSynthesizer;
-import com.baidu.tts.client.SpeechSynthesizerListener;
-import com.baidu.tts.client.TtsMode;
 import com.txt.readerlibrary.base.BaseLibrayActivity;
 import com.txt.readerlibrary.util.BrightnessUtil;
 import com.txt.readerlibrary.db.BookList;
 import com.txt.readerlibrary.db.BookMarks;
 import com.txt.readerlibrary.dialog.PageModeDialog;
 import com.txt.readerlibrary.dialog.SettingDialog;
+import com.txt.readerlibrary.util.CommonUtil;
 import com.txt.readerlibrary.util.PageFactory;
+import com.txt.readerlibrary.utils.LogUtils;
 import com.txt.readerlibrary.view.PageWidget;
 
 import org.litepal.crud.DataSupport;
@@ -58,40 +53,18 @@ import java.util.List;
 /**
  * Created by Administrator on 2016/7/15 0015.
  */
-public class ReadActivity extends BaseLibrayActivity implements SpeechSynthesizerListener {
+public class ReadActivity extends BaseLibrayActivity {
     private static final String TAG = "ReadActivity";
     private final static String EXTRA_BOOK = "bookList";
     private final static int MESSAGE_CHANGEPROGRESS = 1;
-
-
-    private String mSampleDirPath;
-    private static final String SAMPLE_DIR_NAME = "baiduTTS";
-    private static final String SPEECH_FEMALE_MODEL_NAME = "bd_etts_speech_female.dat";
-    private static final String SPEECH_MALE_MODEL_NAME = "bd_etts_speech_male.dat";
-    private static final String TEXT_MODEL_NAME = "bd_etts_text.dat";
-    private static final String LICENSE_FILE_NAME = "temp_license";
-    private static final String ENGLISH_SPEECH_FEMALE_MODEL_NAME = "bd_etts_speech_female_en.dat";
-    private static final String ENGLISH_SPEECH_MALE_MODEL_NAME = "bd_etts_speech_male_en.dat";
-    private static final String ENGLISH_TEXT_MODEL_NAME = "bd_etts_text_en.dat";
-
-
-
-
-
-
-//    @BindView(R.id.bookpage)
     PageWidget bookpage;
 //    @BindView(R.id.toolbar)
     Toolbar toolbar;
 //    @BindView(R.id.appbar)
     AppBarLayout appbar;
 //    @BindView(R.id.tv_stop_read)
-    TextView tv_stopRead;
-//    @BindView(R.id.rl_read_bottom)
-    RelativeLayout rl_read_bottom;
-//    @BindView(R.id.tv_progress)
+//    TextView tv_stopRead;
     TextView tv_progress;
-//    @BindView(R.id.rl_progress)
     RelativeLayout rl_progress;
 //    @BindView(R.id.tv_pre)
     TextView tvPre;
@@ -123,7 +96,6 @@ public class ReadActivity extends BaseLibrayActivity implements SpeechSynthesize
     private PageModeDialog mPageModeDialog;
     private Boolean mDayOrNight;
     // 语音合成客户端
-    private SpeechSynthesizer mSpeechSynthesizer;
     private boolean isSpeaking = false;
 
     // 接收电池信息更新的广播
@@ -151,8 +123,6 @@ public class ReadActivity extends BaseLibrayActivity implements SpeechSynthesize
        bookpage=(PageWidget)findViewById(R.id.bookpage);
         toolbar=(Toolbar)findViewById(R.id.toolbar);
         appbar=(AppBarLayout)findViewById(R.id.appbar);
-        tv_stopRead=(TextView) findViewById(R.id.tv_stop_read);
-        rl_read_bottom=(RelativeLayout) findViewById(R.id.rl_read_bottom);
         tv_progress=(TextView) findViewById(R.id.tv_progress);
         rl_progress=(RelativeLayout) findViewById(R.id.rl_progress);
         tvPre=(TextView) findViewById(R.id.tv_pre);
@@ -199,6 +169,7 @@ public class ReadActivity extends BaseLibrayActivity implements SpeechSynthesize
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ReadActivity.this, MarkActivity.class);
+                intent.putExtra(CommonUtil.IS_NET_URL_CAN,bookList.isNetUrl());
                 startActivity(intent);
             }
         });
@@ -234,23 +205,12 @@ public class ReadActivity extends BaseLibrayActivity implements SpeechSynthesize
 
             }
         });
-      tv_stopRead.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
-              if (mSpeechSynthesizer != null) {
-                  mSpeechSynthesizer.stop();
-                  isSpeaking = false;
-                  hideReadSetting();
-              }
-          }
-      });
 
     }
     @Override
     protected void initData() {
         initView();
 //       initialEnv();
-        mSampleDirPath= TxtReader.getTxtReader().getTTPath();
         if (Build.VERSION.SDK_INT >= 14 && Build.VERSION.SDK_INT < 19) {
             bookpage.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         }
@@ -308,7 +268,7 @@ public class ReadActivity extends BaseLibrayActivity implements SpeechSynthesize
 
         try {
             pageFactory.openBook(bookList);
-            Log.i("cc", bookList.toString());
+            LogUtils.D(bookList.toString());
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(this, "打开电子书失败", Toast.LENGTH_SHORT).show();
@@ -409,7 +369,7 @@ public class ReadActivity extends BaseLibrayActivity implements SpeechSynthesize
             }
         });
 
-        bookpage.setTouchListener(new PageWidget.TouchListener() {
+        bookpage.setTouchListener(new PageWidget.TouchListener() { //页面触摸设置
             @Override
             public void center() {
                 if (isShow) {
@@ -475,17 +435,11 @@ public class ReadActivity extends BaseLibrayActivity implements SpeechSynthesize
         if (!isShow) {
             hideSystemUI();
         }
-        if (mSpeechSynthesizer != null) {
-            mSpeechSynthesizer.resume();
-        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (mSpeechSynthesizer != null) {
-            mSpeechSynthesizer.stop();
-        }
     }
 
     @Override
@@ -495,9 +449,6 @@ public class ReadActivity extends BaseLibrayActivity implements SpeechSynthesize
         bookpage = null;
         unregisterReceiver(myReceiver);
         isSpeaking = false;
-        if (mSpeechSynthesizer != null) {
-            mSpeechSynthesizer.release();
-        }
     }
 
     @Override
@@ -536,8 +487,12 @@ public class ReadActivity extends BaseLibrayActivity implements SpeechSynthesize
 
         if (id == R.id.action_add_bookmark) {
             if (pageFactory.getCurrentPage() != null) {
-                List<BookMarks> bookMarksList = DataSupport.where("bookpath = ? and begin = ?", pageFactory.getBookPath(), pageFactory.getCurrentPage().getBegin() + "").find(BookMarks.class);
-
+                List<BookMarks> bookMarksList=null;
+                if (bookList.isNetUrl()) {
+                    bookMarksList = DataSupport.where("txtUrl = ? and begin = ?", pageFactory.getTxtUrl(), pageFactory.getCurrentPage().getBegin() + "").find(BookMarks.class);
+                }else{
+                    bookMarksList = DataSupport.where("bookpath = ? and begin = ?", pageFactory.getBookPath(), pageFactory.getCurrentPage().getBegin() + "").find(BookMarks.class);
+                }
                 if (!bookMarksList.isEmpty()) {
                     Toast.makeText(ReadActivity.this, "该书签已存在", Toast.LENGTH_SHORT).show();
                 } else {
@@ -553,7 +508,11 @@ public class ReadActivity extends BaseLibrayActivity implements SpeechSynthesize
                         bookMarks.setTime(time);
                         bookMarks.setBegin(pageFactory.getCurrentPage().getBegin());
                         bookMarks.setText(word);
-                        bookMarks.setBookpath(pageFactory.getBookPath());
+                        if (bookList.isNetUrl()) {
+                            bookMarks.setTxtUrl(pageFactory.getTxtUrl());
+                        }else{
+                            bookMarks.setBookpath(pageFactory.getBookPath());
+                        }
                         bookMarks.save();
 
                         Toast.makeText(ReadActivity.this, "书签添加成功", Toast.LENGTH_SHORT).show();
@@ -564,33 +523,13 @@ public class ReadActivity extends BaseLibrayActivity implements SpeechSynthesize
                     }
                 }
             }
-        } else if (id == R.id.action_read_book) {
-            initialTts();
-            if (mSpeechSynthesizer != null) {
-                mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_VOLUME, "5");
-                mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_SPEED, "5");
-                mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_PITCH, "5");
-                mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_SPEAKER, "0");
-//                mSpeechSynthesizer.setParam(SpeechSynthesizer. MIX_MODE_DEFAULT);
-//                mSpeechSynthesizer.setParam(SpeechSynthesizer. AUDIO_ENCODE_AMR);
-//                mSpeechSynthesizer.setParam(SpeechSynthesizer. AUDIO_BITRA TE_AMR_15K85);
-                mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_VOCODER_OPTIM_LEVEL, "0");
-                int result = mSpeechSynthesizer.speak(pageFactory.getCurrentPage().getLineToString());
-                if (result < 0) {
-                    Log.e(TAG, "error,please look up error code in doc or URL:http://yuyin.baidu.com/docs/tts/122 ");
-                } else {
-                    hideReadSetting();
-                    isSpeaking = true;
-                }
-            }
-        }else if(id == R.id.action_read_book) {
-            Intent intent=new Intent(this,FileChooserActivity.class);
+        } else if(id == R.id.action_search) {
+            Intent intent=new Intent(ReadActivity.this,FileChooserActivity.class);
             startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
     }
-
 
     public static boolean openBook(final BookList bookList, Activity context) {
         if (bookList == null) {
@@ -685,9 +624,9 @@ public class ReadActivity extends BaseLibrayActivity implements SpeechSynthesize
         rl_progress.setVisibility(View.GONE);
 
         if (isSpeaking) {
-            Animation topAnim = AnimationUtils.loadAnimation(this, R.anim.dialog_top_enter);
-            rl_read_bottom.startAnimation(topAnim);
-            rl_read_bottom.setVisibility(View.VISIBLE);
+//            Animation topAnim = AnimationUtils.loadAnimation(this, R.anim.dialog_top_enter);
+//            rl_read_bottom.startAnimation(topAnim);
+//            rl_read_bottom.setVisibility(View.VISIBLE);
         } else {
             showSystemUI();
 
@@ -712,163 +651,163 @@ public class ReadActivity extends BaseLibrayActivity implements SpeechSynthesize
         if (appbar.getVisibility() == View.VISIBLE) {
             appbar.startAnimation(topAnim);
         }
-        if (rl_read_bottom.getVisibility() == View.VISIBLE) {
-            rl_read_bottom.startAnimation(topAnim);
-        }
+//        if (rl_read_bottom.getVisibility() == View.VISIBLE) {
+//            rl_read_bottom.startAnimation(topAnim);
+//        }
 //        ll_top.startAnimation(topAnim);
         rl_bottom.setVisibility(View.GONE);
-        rl_read_bottom.setVisibility(View.GONE);
+//        rl_read_bottom.setVisibility(View.GONE);
 //        ll_top.setVisibility(View.GONE);
         appbar.setVisibility(View.GONE);
         hideSystemUI();
     }
-    private  void  getActivityMetaData(){
-        try {
-            ActivityInfo info=this.getPackageManager()
-                    .getActivityInfo(getComponentName(),
-                            PackageManager.GET_META_DATA);
-            appId =info.metaData.getInt("BaiDuTts_AppId")+"";
-            Log.i("cc","appId--->"+appId);
-            appKey=info.metaData.getString("BaiDuTts_ApiKey");
-            appSecreKey=info.metaData.getString("BaiDuTts_SecretKey");
-        }catch ( Exception e){
-            e.printStackTrace();
-        }
-
-    }
-    String appId;
-    String appKey;
-    String  appSecreKey;
-    private void initialTts() {
-        getActivityMetaData();
-        Log.i("cc","appId--->"+appId+"appKey--->"+appKey+"appSecreKey--->"+appSecreKey);
-        this.mSpeechSynthesizer = SpeechSynthesizer.getInstance();
-        this.mSpeechSynthesizer.setContext(this);
-        this.mSpeechSynthesizer.setSpeechSynthesizerListener(this);
-        // 文本模型文件路径 (离线引擎使用)
-        this.mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_TTS_TEXT_MODEL_FILE, mSampleDirPath + "/" //TxtReader.getTxtReader().getTTPath()
-                + TEXT_MODEL_NAME);
-        // 声学模型文件路径 (离线引擎使用)
-        this.mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_TTS_SPEECH_MODEL_FILE,mSampleDirPath + "/"
-                + SPEECH_FEMALE_MODEL_NAME);
-        // 本地授权文件路径,如未设置将使用默认路径.设置临时授权文件路径，LICENCE_FILE_NAME请替换成临时授权文件的实际路径，仅在使用临时license文件时需要进行设置，如果在[应用管理]中开通了正式离线授权，不需要设置该参数，建议将该行代码删除（离线引擎）
-        // 如果合成结果出现临时授权文件将要到期的提示，说明使用了临时授权文件，请删除临时授权即可。
-//        this.mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_TTS_LICENCE_FILE, ((AppContext)getApplication()).getTTPath() + "/"
-//                + AppContext.LICENSE_FILE_NAME);
-        // 请替换为语音开发者平台上注册应用得到的App ID (离线授权)
-        this.mSpeechSynthesizer.setAppId(appId/*这里只是为了让Demo运行使用的APPID,请替换成自己的id。*/);
-        // 请替换为语音开发者平台注册应用得到的apikey和secretkey (在线授权)
-        this.mSpeechSynthesizer.setApiKey(appKey,
-                appSecreKey/*这里只是为了让Demo正常运行使用APIKey,请替换成自己的APIKey*/);
-        // 发音人（在线引擎），可用参数为0,1,2,3。。。（服务器端会动态增加，各值含义参考文档，以文档说明为准。0--普通女声，1--普通男声，2--特别男声，3--情感男声。。。）
-        this.mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_SPEAKER, "0");
-        // 设置Mix模式的合成策略
-        this.mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_MIX_MODE, SpeechSynthesizer.MIX_MODE_DEFAULT);
-        // 授权检测接口(只是通过AuthInfo进行检验授权是否成功。)
-        // AuthInfo接口用于测试开发者是否成功申请了在线或者离线授权，如果测试授权成功了，可以删除AuthInfo部分的代码（该接口首次验证时比较耗时），不会影响正常使用（合成使用时SDK内部会自动验证授权）
-        AuthInfo authInfo = this.mSpeechSynthesizer.auth(TtsMode.MIX);
-
-        if (authInfo.isSuccess()) {
-            Log.e(TAG, "auth success");
-        } else {
-            String errorMsg = authInfo.getTtsError().getDetailMessage();
-            Log.e(TAG, "auth failed errorMsg=" + errorMsg);
-        }
-
-        // 初始化tts
-        mSpeechSynthesizer.initTts(TtsMode.MIX);
-        // 加载离线英文资源（提供离线英文合成功能）
-        int result = mSpeechSynthesizer.loadEnglishModel(mSampleDirPath + "/" + ENGLISH_TEXT_MODEL_NAME, mSampleDirPath
-                + "/" + ENGLISH_SPEECH_FEMALE_MODEL_NAME);
-
-      Log.i("cc","result--->"+result);
-//        toPrint("loadEnglishModel result=" + result);
+//    private  void  getActivityMetaData(){
+//        try {
+//            ActivityInfo info=this.getPackageManager()
+//                    .getActivityInfo(getComponentName(),
+//                            PackageManager.GET_META_DATA);
+//            appId =info.metaData.getInt("BaiDuTts_AppId")+"";
+//            Log.i("cc","appId--->"+appId);
+//            appKey=info.metaData.getString("BaiDuTts_ApiKey");
+//            appSecreKey=info.metaData.getString("BaiDuTts_SecretKey");
+//        }catch ( Exception e){
+//            e.printStackTrace();
+//        }
 //
-//        //打印引擎信息和model基本信息
-//        printEngineInfo();
-    }
+//    }
+//    String appId;
+//    String appKey;
+//    String  appSecreKey;
+//    private void initialTts() {
+//        getActivityMetaData();
+//        Log.i("cc","appId--->"+appId+"appKey--->"+appKey+"appSecreKey--->"+appSecreKey);
+//        this.mSpeechSynthesizer = SpeechSynthesizer.getInstance();
+//        this.mSpeechSynthesizer.setContext(this);
+//        this.mSpeechSynthesizer.setSpeechSynthesizerListener(this);
+//        // 文本模型文件路径 (离线引擎使用)
+//        this.mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_TTS_TEXT_MODEL_FILE, mSampleDirPath + "/" //TxtReader.getTxtReader().getTTPath()
+//                + TEXT_MODEL_NAME);
+//        // 声学模型文件路径 (离线引擎使用)
+//        this.mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_TTS_SPEECH_MODEL_FILE,mSampleDirPath + "/"
+//                + SPEECH_FEMALE_MODEL_NAME);
+//        // 本地授权文件路径,如未设置将使用默认路径.设置临时授权文件路径，LICENCE_FILE_NAME请替换成临时授权文件的实际路径，仅在使用临时license文件时需要进行设置，如果在[应用管理]中开通了正式离线授权，不需要设置该参数，建议将该行代码删除（离线引擎）
+//        // 如果合成结果出现临时授权文件将要到期的提示，说明使用了临时授权文件，请删除临时授权即可。
+////        this.mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_TTS_LICENCE_FILE, ((AppContext)getApplication()).getTTPath() + "/"
+////                + AppContext.LICENSE_FILE_NAME);
+//        // 请替换为语音开发者平台上注册应用得到的App ID (离线授权)
+//        this.mSpeechSynthesizer.setAppId(appId/*这里只是为了让Demo运行使用的APPID,请替换成自己的id。*/);
+//        // 请替换为语音开发者平台注册应用得到的apikey和secretkey (在线授权)
+//        this.mSpeechSynthesizer.setApiKey(appKey,
+//                appSecreKey/*这里只是为了让Demo正常运行使用APIKey,请替换成自己的APIKey*/);
+//        // 发音人（在线引擎），可用参数为0,1,2,3。。。（服务器端会动态增加，各值含义参考文档，以文档说明为准。0--普通女声，1--普通男声，2--特别男声，3--情感男声。。。）
+//        this.mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_SPEAKER, "0");
+//        // 设置Mix模式的合成策略
+//        this.mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_MIX_MODE, SpeechSynthesizer.MIX_MODE_DEFAULT);
+//        // 授权检测接口(只是通过AuthInfo进行检验授权是否成功。)
+//        // AuthInfo接口用于测试开发者是否成功申请了在线或者离线授权，如果测试授权成功了，可以删除AuthInfo部分的代码（该接口首次验证时比较耗时），不会影响正常使用（合成使用时SDK内部会自动验证授权）
+//        AuthInfo authInfo = this.mSpeechSynthesizer.auth(TtsMode.MIX);
+//
+//        if (authInfo.isSuccess()) {
+//            Log.e(TAG, "auth success");
+//        } else {
+//            String errorMsg = authInfo.getTtsError().getDetailMessage();
+//            Log.e(TAG, "auth failed errorMsg=" + errorMsg);
+//        }
+//
+//        // 初始化tts
+//        mSpeechSynthesizer.initTts(TtsMode.MIX);
+//        // 加载离线英文资源（提供离线英文合成功能）
+//        int result = mSpeechSynthesizer.loadEnglishModel(mSampleDirPath + "/" + ENGLISH_TEXT_MODEL_NAME, mSampleDirPath
+//                + "/" + ENGLISH_SPEECH_FEMALE_MODEL_NAME);
+//
+//      Log.i("cc","result--->"+result);
+////        toPrint("loadEnglishModel result=" + result);
+////
+////        //打印引擎信息和model基本信息
+////        printEngineInfo();
+//    }
 
 
-    /*
-    * @param arg0
-    */
-    @Override
-    public void onSynthesizeStart(String s) {
-
-    }
-
-    /**
-     * 合成数据和进度的回调接口，分多次回调
-     *
-     * @param utteranceId
-     * @param data        合成的音频数据。该音频数据是采样率为16K，2字节精度，单声道的pcm数据。
-     * @param progress    文本按字符划分的进度，比如:你好啊 进度是0-3
-     */
-    @Override
-    public void onSynthesizeDataArrived(String utteranceId, byte[] data, int progress) {
-
-    }
-
-    /**
-     * 合成正常结束，每句合成正常结束都会回调，如果过程中出错，则回调onError，不再回调此接口
-     *
-     * @param utteranceId
-     */
-    @Override
-    public void onSynthesizeFinish(String utteranceId) {
-
-    }
-
-    /**
-     * 播放开始，每句播放开始都会回调
-     *
-     * @param utteranceId
-     */
-    @Override
-    public void onSpeechStart(String utteranceId) {
-
-    }
-
-    /**
-     * 播放进度回调接口，分多次回调
-     *
-     * @param utteranceId
-     * @param progress    文本按字符划分的进度，比如:你好啊 进度是0-3
-     */
-    @Override
-    public void onSpeechProgressChanged(String utteranceId, int progress) {
-
-    }
-
-    /**
-     * 播放正常结束，每句播放正常结束都会回调，如果过程中出错，则回调onError,不再回调此接口
-     *
-     * @param utteranceId
-     */
-    @Override
-    public void onSpeechFinish(String utteranceId) {
-        pageFactory.nextPage();
-        if (pageFactory.islastPage()) {
-            isSpeaking = false;
-            Toast.makeText(ReadActivity.this, "小说已经读完了", Toast.LENGTH_SHORT);
-        } else {
-            isSpeaking = true;
-            mSpeechSynthesizer.speak(pageFactory.getCurrentPage().getLineToString());
-        }
-    }
-
-    /**
-     * 当合成或者播放过程中出错时回调此接口
-     *
-     * @param utteranceId
-     * @param error       包含错误码和错误信息
-     */
-    @Override
-    public void onError(String utteranceId, SpeechError error) {
-        mSpeechSynthesizer.stop();
-        isSpeaking = false;
-        Log.e(TAG, error.description);
-    }
+//    /*
+//    * @param arg0
+//    */
+//    @Override
+//    public void onSynthesizeStart(String s) {
+//
+//    }
+//
+//    /**
+//     * 合成数据和进度的回调接口，分多次回调
+//     *
+//     * @param utteranceId
+//     * @param data        合成的音频数据。该音频数据是采样率为16K，2字节精度，单声道的pcm数据。
+//     * @param progress    文本按字符划分的进度，比如:你好啊 进度是0-3
+//     */
+//    @Override
+//    public void onSynthesizeDataArrived(String utteranceId, byte[] data, int progress) {
+//
+//    }
+//
+//    /**
+//     * 合成正常结束，每句合成正常结束都会回调，如果过程中出错，则回调onError，不再回调此接口
+//     *
+//     * @param utteranceId
+//     */
+//    @Override
+//    public void onSynthesizeFinish(String utteranceId) {
+//
+//    }
+//
+//    /**
+//     * 播放开始，每句播放开始都会回调
+//     *
+//     * @param utteranceId
+//     */
+//    @Override
+//    public void onSpeechStart(String utteranceId) {
+//
+//    }
+//
+//    /**
+//     * 播放进度回调接口，分多次回调
+//     *
+//     * @param utteranceId
+//     * @param progress    文本按字符划分的进度，比如:你好啊 进度是0-3
+//     */
+//    @Override
+//    public void onSpeechProgressChanged(String utteranceId, int progress) {
+//
+//    }
+//
+//    /**
+//     * 播放正常结束，每句播放正常结束都会回调，如果过程中出错，则回调onError,不再回调此接口
+//     *
+//     * @param utteranceId
+//     */
+//    @Override
+//    public void onSpeechFinish(String utteranceId) {
+//        pageFactory.nextPage();
+//        if (pageFactory.islastPage()) {
+//            isSpeaking = false;
+//            Toast.makeText(ReadActivity.this, "小说已经读完了", Toast.LENGTH_SHORT);
+//        } else {
+//            isSpeaking = true;
+//            mSpeechSynthesizer.speak(pageFactory.getCurrentPage().getLineToString());
+//        }
+//    }
+//
+//    /**
+//     * 当合成或者播放过程中出错时回调此接口
+//     *
+//     * @param utteranceId
+//     * @param error       包含错误码和错误信息
+//     */
+//    @Override
+//    public void onError(String utteranceId, SpeechError error) {
+//        mSpeechSynthesizer.stop();
+//        isSpeaking = false;
+//        Log.e(TAG, error.description);
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

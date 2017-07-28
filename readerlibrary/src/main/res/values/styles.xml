@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
+    <style name="txtAppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:windowContentOverlay">@color/white</item>
+    </style>
     <style name="setting_dialog" parent="@style/Theme.AppCompat.Light.Dialog">
         <item name="colorPrimary">@color/read_dialog_bg</item>
         <item name="colorPrimaryDark">@color/read_dialog_bg</item>
@@ -49,7 +56,7 @@
         <item name="@android:windowExitAnimation">@anim/dialog_exit</item>
     </style>
 
-    <style name="NoActionBar">
+    <style name="NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/read_dialog_bg</item>
         <item name="colorPrimaryDark">@color/read_dialog_bg</item>
         <item name="windowActionBar">false</item>

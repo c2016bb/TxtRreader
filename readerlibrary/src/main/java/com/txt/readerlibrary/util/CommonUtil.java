@@ -17,6 +17,8 @@ import java.lang.reflect.Method;
  * Created by Administrator on 2016/1/17.
  */
 public class CommonUtil {
+   public  static  final  String  IS_NET_URL_CAN="IS_URL";
+
 
     /**
      * 获取屏幕原始尺寸高度，包括虚拟功能键高度

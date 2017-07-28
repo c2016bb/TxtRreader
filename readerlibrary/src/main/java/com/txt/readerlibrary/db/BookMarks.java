@@ -7,12 +7,20 @@ import org.litepal.crud.DataSupport;
  */
 public class BookMarks extends DataSupport {
     private int id ;
-  //  private int page;
     private long begin; // 书签记录页面的结束点位置
-  //  private int count;
     private String text;
     private String time;
     private String bookpath;
+    private String txtUrl;
+
+    public String getTxtUrl() {
+        return txtUrl;
+    }
+
+    public void setTxtUrl(String txtUrl) {
+        this.txtUrl = txtUrl;
+    }
+
     public int getId() {
         return this.id;
     }

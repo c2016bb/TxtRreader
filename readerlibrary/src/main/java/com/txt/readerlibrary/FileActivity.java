@@ -236,12 +236,13 @@ public class FileActivity extends BaseLibrayActivity{
 
     //设置添加按钮text
     protected void setAddFileText(final int num) {
-        btnAddFile.post(new Runnable() {
-            @Override
-            public void run() {
-                btnAddFile.setText("加入书架(" + num + ")项");
-            }
-        });
+        btnAddFile.setText("导入图书");
+//        btnAddFile.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                btnAddFile.setText("加入书架(" + num + ")项");
+//            }
+//        });
     }
 
     protected void searchFile() {

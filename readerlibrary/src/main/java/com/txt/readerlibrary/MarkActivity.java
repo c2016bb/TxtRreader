@@ -14,6 +14,7 @@ import com.astuetz.PagerSlidingTabStrip;
 import com.txt.readerlibrary.adapter.MyPagerAdapter;
 import com.txt.readerlibrary.base.BaseLibrayActivity;
 import com.txt.readerlibrary.db.BookCatalogue;
+import com.txt.readerlibrary.util.CommonUtil;
 import com.txt.readerlibrary.util.FileUtils;
 import com.txt.readerlibrary.util.PageFactory;
 
@@ -37,7 +38,7 @@ public class MarkActivity extends BaseLibrayActivity {
     private Typeface typeface;
     private ArrayList<BookCatalogue> catalogueList = new ArrayList<>();
     private DisplayMetrics dm;
-
+   private  boolean  isNetUrl;
     @Override
     public int getLayoutRes() {
         return R.layout.activity_mark;
@@ -53,6 +54,8 @@ public class MarkActivity extends BaseLibrayActivity {
 
     @Override
     protected void initData() {
+      isNetUrl=getIntent().getBooleanExtra(CommonUtil.IS_NET_URL_CAN,true);
+
         initView();
 
         pageFactory = PageFactory.getInstance();
@@ -70,11 +73,19 @@ public class MarkActivity extends BaseLibrayActivity {
             }
         });
         if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(FileUtils.getFileName(pageFactory.getBookPath()));
+            if (isNetUrl) {
+                getSupportActionBar().setTitle(FileUtils.getFileName(pageFactory.getTxtUrl()));
+            }else{
+                getSupportActionBar().setTitle(FileUtils.getFileName(pageFactory.getBookPath()));
+            }
         }
 
         setTabsValue();
-        pager.setAdapter(new MyPagerAdapter(getSupportFragmentManager(), pageFactory.getBookPath()));
+        if (isNetUrl) {
+            pager.setAdapter(new MyPagerAdapter(getSupportFragmentManager(), pageFactory.getTxtUrl(),isNetUrl));
+        }else{
+            pager.setAdapter(new MyPagerAdapter(getSupportFragmentManager(),pageFactory.getBookPath(),isNetUrl));
+        }
         tabs.setViewPager(pager);
     }
 

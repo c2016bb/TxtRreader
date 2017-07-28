@@ -6,6 +6,9 @@ import org.mozilla.universalchardet.UniversalDetector;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +16,33 @@ import java.util.List;
  * Created by Administrator on 2016/7/11 0011.
  */
 public class FileUtils {
+
+    /**
+     * 获取文件编码
+     * @param fis
+     * @return
+     * @throws IOException
+     */
+    public static String getCharsetByInputStream(InputStream fis) throws IOException{
+        String charset;
+
+//        FileInputStream fis = new FileInputStream(is);
+        byte[] buf = new byte[4096];
+        // (1)
+        UniversalDetector detector = new UniversalDetector(null);
+        // (2)
+        int nread;
+        while ((nread = fis.read(buf)) > 0 && !detector.isDone()) {
+            detector.handleData(buf, 0, nread);
+        }
+        // (3)
+        detector.dataEnd();
+        // (4)
+        charset = detector.getDetectedCharset();
+        // (5)
+        detector.reset();
+        return charset;
+    }
 
     /**
      * 获取文件编码
@@ -54,6 +84,20 @@ public class FileUtils {
             return "";
         }
 
+    }
+
+    public static InputStream getUrlStream(String path)throws IOException{
+            URL url = new URL(path);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setConnectTimeout(5000);
+            conn.setRequestMethod("GET");
+            int code = conn.getResponseCode();
+            if (code == 200) {
+                InputStream is = conn.getInputStream(); // 字节流转换成字符串
+                return is;
+            } else {
+                throw  new IOException();
+            }
     }
 
     public static  List<File> getSuffixFile(String filePath, String suffere){

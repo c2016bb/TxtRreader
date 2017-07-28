@@ -14,6 +14,15 @@ public class BookList extends DataSupport implements Serializable{
     private long begin;
     private String charset;//编码格式
     private String txtUrl; //txt文件网络路径
+    private boolean isNetUrl; //判断是否通过网络请求还是本地的的文件获取到的数据
+
+    public boolean isNetUrl() {
+        return isNetUrl;
+    }
+
+    public void setNetUrl(boolean netUrl) {
+        isNetUrl = netUrl;
+    }
 
     public String getTxtUrl() {
         return txtUrl;
@@ -32,6 +41,7 @@ public class BookList extends DataSupport implements Serializable{
                 ", begin=" + begin +
                 ", charset='" + charset + '\'' +
                 ", txtUrl='" + txtUrl + '\'' +
+                ", isNetUrl=" + isNetUrl +
                 '}';
     }
 
