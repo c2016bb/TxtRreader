@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 /**
  * Created by Administrator on 2016/8/31 0031.
  */
-public abstract class BaseFragment extends Fragment {
+public abstract class TxtBaseFragment extends Fragment {
 
     private View rootView;
     /**

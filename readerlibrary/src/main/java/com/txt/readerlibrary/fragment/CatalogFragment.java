@@ -9,7 +9,7 @@ import android.widget.ListView;
 
 import com.txt.readerlibrary.R;
 import com.txt.readerlibrary.adapter.CatalogueAdapter;
-import com.txt.readerlibrary.base.BaseFragment;
+import com.txt.readerlibrary.base.TxtBaseFragment;
 import com.txt.readerlibrary.db.BookCatalogue;
 import com.txt.readerlibrary.util.PageFactory;
 
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 /**
  * Created by Administrator on 2016/8/31 0031.
  */
-public class CatalogFragment extends BaseFragment {
+public class CatalogFragment extends TxtBaseFragment {
     public static final String ARGUMENT = "argument";
     ListView lv_catalogue;
 

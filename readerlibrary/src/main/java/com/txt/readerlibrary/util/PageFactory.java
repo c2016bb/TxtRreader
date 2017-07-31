@@ -14,7 +14,6 @@ import android.graphics.Region;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -23,7 +22,7 @@ import com.txt.readerlibrary.R;
 import com.txt.readerlibrary.db.BookCatalogue;
 import com.txt.readerlibrary.db.BookList;
 import com.txt.readerlibrary.utils.DownLoadFile;
-import com.txt.readerlibrary.utils.LogUtils;
+import com.txt.readerlibrary.utils.TxtLogUtils;
 import com.txt.readerlibrary.view.PageWidget;
 
 import org.litepal.crud.DataSupport;
@@ -176,7 +175,7 @@ public class PageFactory {
     }
 
     private PageFactory(Context context) {
-        Log.i(TAG,"执行PageFactory");
+        TxtLogUtils.D("执行PageFactory");
         mBookUtil = new BookUtil();
         mContext = context.getApplicationContext();
         config = Config.getInstance();
@@ -307,8 +306,7 @@ public class PageFactory {
         if (getDirectoryList().size() > 0 && updateCharter) {
             currentCharter = getCurrentCharter();
         }
-
-        Log.i(TAG,"currentCharter---->"+currentCharter);
+        TxtLogUtils.D("currentCharter---->"+currentCharter);
         //更新数据库进度
         if (currentPage != null && bookList != null){
             new Thread() {
@@ -334,7 +332,7 @@ public class PageFactory {
         if (m_lines.size() > 0) {
             float y = marginHeight;
             for (String strLine : m_lines) {//绘制每一行
-                Log.i("cc","strLine--->"+strLine);
+                TxtLogUtils.D("strLine--->"+strLine);
                 y += m_fontSize + lineSpace;
                 c.drawText(strLine, measureMarginWidth, y, mPaint);
 //                word.append(strLine);
@@ -395,7 +393,7 @@ public class PageFactory {
    //向前翻页
     public void prePage(){
         if (currentPage.getBegin() <= 0) {
-            Log.e(TAG,"当前是第一页");
+            TxtLogUtils.D("当前是第一页");
             if (!m_isfirstPage){
                 Toast.makeText(mContext, "当前是第一页", Toast.LENGTH_SHORT).show();
             }
@@ -414,7 +412,7 @@ public class PageFactory {
     //向后翻页
     public void nextPage(){
         if (currentPage.getEnd() >= mBookUtil.getBookLen()) {
-            Log.e(TAG,"已经是最后一页了");
+            TxtLogUtils.D("已经是最后一页了");
             if (!m_islastPage){
                 Toast.makeText(mContext, "已经是最后一页了", Toast.LENGTH_SHORT).show();
             }
@@ -429,7 +427,7 @@ public class PageFactory {
         prePage = currentPage;
         currentPage = getNextPage();
         onDraw(mBookPageWidget.getNextPage(),currentPage.getLines(),true);
-        Log.e("nextPage","nextPagenext");
+        TxtLogUtils.D("nextPagenext");
     }
 
     //取消翻页
@@ -467,7 +465,7 @@ public class PageFactory {
             bookTask.cancel(true);
         }
         bookTask = new BookTask();
-        Log.i("CC","bookList.getBegin()--->"+bookList.getBegin());
+        TxtLogUtils.D("bookList.getBegin()--->"+bookList.getBegin());
         bookTask.execute(bookList.getBegin());
     }
 
@@ -476,7 +474,7 @@ public class PageFactory {
         @Override
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
-            Log.e("onPostExecute",isCancelled() + "");
+            TxtLogUtils.D(isCancelled() + "");
             if (isCancelled()){
                 return;
             }
@@ -509,7 +507,7 @@ public class PageFactory {
         @Override
         protected Boolean doInBackground(Long... params) {
             begin = params[0];
-            LogUtils.D("begin--->"+begin);
+            TxtLogUtils.D("begin--->"+begin);
             try {
                 mBookUtil.openBook(bookList);
             } catch (Exception e) {
@@ -528,7 +526,7 @@ public class PageFactory {
         trPage.setBegin(currentPage.getEnd() + 1);
         trPage.setLines(getNextLines());
         trPage.setEnd(mBookUtil.getPosition());
-        Log.i(TAG,"trPage.toString()"+trPage.toString()
+        TxtLogUtils.D("trPage.toString()"+trPage.toString()
         );
         return trPage;
     }
@@ -538,9 +536,9 @@ public class PageFactory {
 
         TRPage trPage = new TRPage();
         trPage.setEnd(mBookUtil.getPosition() - 1);
-        Log.e("end",mBookUtil.getPosition() - 1 + "");
+        TxtLogUtils.D(mBookUtil.getPosition() - 1 + "");
         trPage.setLines(getPreLines());
-        Log.e("begin",mBookUtil.getPosition() + "");
+        TxtLogUtils.D(mBookUtil.getPosition() + "");
         trPage.setBegin(mBookUtil.getPosition());
         return trPage;
     }
@@ -552,7 +550,7 @@ public class PageFactory {
         mBookUtil.setPostition(begin - 1);
         trPage.setLines(getNextLines());
         trPage.setEnd(mBookUtil.getPosition());
-        Log.i(TAG,"trPage----."+trPage.toString());
+        TxtLogUtils.D("trPage----."+trPage.toString());
         return trPage;
     }
 
@@ -564,12 +562,12 @@ public class PageFactory {
         while (mBookUtil.next(true) != -1){
             char word = (char) mBookUtil.next(false);
 
-            Log.i(TAG,word+"--->word");
+            TxtLogUtils.D(word+"--->word");
             //判断是否换行
             if ((word + "" ).equals("\r") && (((char) mBookUtil.next(true)) + "").equals("\n")){//换行时
                 mBookUtil.next(false);
                 if (!line.isEmpty()){
-                    Log.i("cc",line+"");
+                    TxtLogUtils.D(line+"");
                     lines.add(line);
 //                    lines.add(" ");//当换行时  增加一行空格行
                     line = "";
@@ -586,7 +584,7 @@ public class PageFactory {
                 width += widthChar;
                 if (width > mVisibleWidth) {
                     width = widthChar;
-                    Log.i("cc1","line--->"+line);
+                    TxtLogUtils.D("line--->"+line);
                     lines.add(line);
                     line = word + "";
                 } else {
@@ -606,7 +604,7 @@ public class PageFactory {
             lines.add(line);
         }
         for (String str : lines){
-            Log.e(TAG,str + "   ");
+            TxtLogUtils.D(str + "   ");
         }
         return lines;
     }
@@ -653,7 +651,7 @@ public class PageFactory {
             }else{
                 num = num + lines.get(i).length();
             }
-            Log.e(TAG,lines.get(i) + "   ");
+            TxtLogUtils.D(lines.get(i) + "   ");
         }
 
         if (num > 0){

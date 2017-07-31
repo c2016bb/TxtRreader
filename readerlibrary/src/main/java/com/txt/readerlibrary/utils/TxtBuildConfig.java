@@ -4,8 +4,8 @@ package com.txt.readerlibrary.utils;
  * Created by User on 2017/7/20.
  */
 
-public class BuildConfig {
-    public static final boolean DEBUG = Boolean.parseBoolean("true");
+public class TxtBuildConfig {
+    public static final boolean DEBUG = Boolean.parseBoolean("false");
     public static final String APPLICATION_ID = "com.first.ahlib";
     public static final String BUILD_TYPE = "debug";
     public static final String FLAVOR = "";

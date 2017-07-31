@@ -12,7 +12,7 @@ import android.widget.ListView;
 
 import com.txt.readerlibrary.R;
 import com.txt.readerlibrary.adapter.MarkAdapter;
-import com.txt.readerlibrary.base.BaseFragment;
+import com.txt.readerlibrary.base.TxtBaseFragment;
 import com.txt.readerlibrary.db.BookMarks;
 import com.txt.readerlibrary.util.PageFactory;
 
@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Created by Administrator on 2016/8/31 0031.
  */
-public class BookMarkFragment extends BaseFragment {
+public class BookMarkFragment extends TxtBaseFragment {
     public static final String ARGUMENT = "argument";
     public  static  final  String  IS_NET_URL_MARK_FRAGMENT="IS_URL_MARK";
     ListView lv_bookmark;
@@ -92,7 +92,11 @@ public class BookMarkFragment extends BaseFragment {
                             public void onClick(DialogInterface dialog, int which) {
                                 DataSupport.delete(BookMarks.class, bookMarksList.get(position).getId());//
                                 bookMarksList.clear();
-                                bookMarksList.addAll(DataSupport.where("bookpath = ?", bookpath).find(BookMarks.class));
+                                if (isNetUrl) {
+                                    bookMarksList.addAll(DataSupport.where("txtUrl = ?", bookpath).find(BookMarks.class));
+                                }else{
+                                    bookMarksList.addAll(DataSupport.where("bookpath = ?", bookpath).find(BookMarks.class));
+                                }
                                 markAdapter.notifyDataSetChanged();
                             }
                         }).setCancelable(true).show();

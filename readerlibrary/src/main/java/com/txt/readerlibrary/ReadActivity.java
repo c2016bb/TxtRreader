@@ -38,7 +38,7 @@ import com.txt.readerlibrary.dialog.PageModeDialog;
 import com.txt.readerlibrary.dialog.SettingDialog;
 import com.txt.readerlibrary.util.CommonUtil;
 import com.txt.readerlibrary.util.PageFactory;
-import com.txt.readerlibrary.utils.LogUtils;
+import com.txt.readerlibrary.utils.TxtLogUtils;
 import com.txt.readerlibrary.view.PageWidget;
 
 import org.litepal.crud.DataSupport;
@@ -268,7 +268,7 @@ public class ReadActivity extends BaseLibrayActivity {
 
         try {
             pageFactory.openBook(bookList);
-            LogUtils.D(bookList.toString());
+            TxtLogUtils.D(bookList.toString());
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(this, "打开电子书失败", Toast.LENGTH_SHORT).show();

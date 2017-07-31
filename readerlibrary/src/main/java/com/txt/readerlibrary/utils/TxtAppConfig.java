@@ -8,7 +8,7 @@ import java.io.File;
  * Created by User on 2017/7/20.
  */
 
-public class AppConfig {
+public class TxtAppConfig {
     public static String getDownLoadBookPath() {
 
         String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/txtreader/DownLoad/";

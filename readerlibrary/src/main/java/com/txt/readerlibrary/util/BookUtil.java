@@ -1,18 +1,14 @@
 package com.txt.readerlibrary.util;
 
 import android.content.ContentValues;
-import android.content.pm.ProviderInfo;
-import android.os.AsyncTask;
 import android.os.Environment;
 import android.text.TextUtils;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.txt.readerlibrary.bean.Cache;
 import com.txt.readerlibrary.db.BookCatalogue;
 import com.txt.readerlibrary.db.BookList;
 import com.txt.readerlibrary.utils.DownLoadFile;
-import com.txt.readerlibrary.utils.LogUtils;
+import com.txt.readerlibrary.utils.TxtLogUtils;
 
 import org.litepal.crud.DataSupport;
 
@@ -98,7 +94,7 @@ public class BookUtil {
 
     public int next(boolean back){
         position += 1;
-        Log.i(TAG,"position--->"+position+"bookLen---->"+bookLen);
+        TxtLogUtils.D("position--->"+position+"bookLen---->"+bookLen);
         if (position > bookLen){
             position = bookLen;
             return -1;
@@ -108,7 +104,7 @@ public class BookUtil {
             position -= 1;
         }
 
-        Log.i(TAG,"position--->"+position);
+        TxtLogUtils.D("position--->"+position);
         return result;
     }
 
@@ -265,10 +261,10 @@ public class BookUtil {
 
     //缓存书本
     private void cacheBookUrl(InputStream is) throws IOException {
-        Log.i(TAG,"booklist--->"+bookList.toString());
+        TxtLogUtils.D("booklist--->"+bookList.toString());
         if (TextUtils.isEmpty(bookList.getCharset())) {
             m_strCharsetName = FileUtils.getCharsetByInputStream(is);
-            LogUtils.D("m_strCharsetName---->"+m_strCharsetName);
+            TxtLogUtils.D("m_strCharsetName---->"+m_strCharsetName);
             if (m_strCharsetName == null) {
                 m_strCharsetName = "utf-8";
             }
@@ -278,7 +274,7 @@ public class BookUtil {
         }else{
             m_strCharsetName = bookList.getCharset();
         }
-        Log.i(TAG,"m_strCharsetName---->xzcv"+m_strCharsetName);
+        TxtLogUtils.D("m_strCharsetName---->xzcv"+m_strCharsetName);
 //        File file = new File(bookPath);
         InputStreamReader reader = new InputStreamReader(is,m_strCharsetName);
         int index = 0;
@@ -294,14 +290,14 @@ public class BookUtil {
             }
 
             String bufStr = new String(buf);
-//            Log.i(TAG,"bufstr-=---->"+bufStr);
+//            TxtLogUtils.D("bufstr-=---->"+bufStr);
 //            bufStr = bufStr.replaceAll("\r\n","\r\n\u3000\u3000");
 //            bufStr = bufStr.replaceAll("\u3000\u3000+[ ]*","\u3000\u3000");
             bufStr = bufStr.replaceAll("\r\n+\\s*","\r\n\u3000\u3000");
 //            bufStr = bufStr.replaceAll("\r\n[ {0,}]","\r\n\u3000\u3000");
 //            bufStr = bufStr.replaceAll(" ","");
             bufStr = bufStr.replaceAll("\u0000","");
-            Log.i(TAG,"bufStr--->"+bufStr);
+            TxtLogUtils.D("bufStr--->"+bufStr);
             buf = bufStr.toCharArray();
             bookLen += buf.length;
 
@@ -315,9 +311,9 @@ public class BookUtil {
 //            myArray.set(index,);
             try {
                 File cacheBook = new File(fileName(index));
-                LogUtils.D("fileName(index)--。"+fileName(index));
+                TxtLogUtils.D("fileName(index)--。"+fileName(index));
                 if (!cacheBook.exists()){
-                    Log.i(TAG,"创建文件");
+                    TxtLogUtils.D("创建文件");
                     cacheBook.createNewFile();
                 }
                 final OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(fileName(index)), "UTF-16LE");
@@ -328,7 +324,7 @@ public class BookUtil {
             }
             index ++;
         }
-   LogUtils.D("预开启线程");
+   TxtLogUtils.D("预开启线程");
         new Thread(){
             @Override
             public void run() {
@@ -339,20 +335,20 @@ public class BookUtil {
 
     //获取章节
     public synchronized void getChapter(){
-        LogUtils.D("获取章节");
+        TxtLogUtils.D("获取章节");
         try {
             long size = 0;
-            Log.i(TAG,"myArray.size()---->"+myArray.size());
+            TxtLogUtils.D("myArray.size()---->"+myArray.size());
             for (int i = 0; i < myArray.size(); i++) {
                 char[] buf = block(i);
                 String bufStr = new String(buf);
                 String[] paragraphs = bufStr.split("\r\n");//划分段落
                 for (String str : paragraphs) {
                     if (str.length() <= 30 && (str.matches(".*第.{1,8}章.*") || str.matches(".*第.{1,8}节.*"))) {
-                        Log.i(TAG,"章节---》"+str);
+                        TxtLogUtils.D("章节---》"+str);
 
                         BookCatalogue bookCatalogue = new BookCatalogue();
-                        Log.i(TAG,"size--->"+size);
+                        TxtLogUtils.D("size--->"+size);
                         bookCatalogue.setBookCatalogueStartPos(size);
 
                         bookCatalogue.setBookCatalogue(str);
@@ -395,7 +391,7 @@ public class BookUtil {
         }
         char[] block = myArray.get(index).getData().get();
         if (block == null) {
-            Log.i(TAG,"inde--->"+index+"无缓存值");
+            TxtLogUtils.D("inde--->"+index+"无缓存值");
             try {
                 File file = new File(fileName(index));
                 int size = (int)file.length();

@@ -1,29 +1,20 @@
 package com.txt.readerlibrary;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Application;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.AsyncTask;
-import android.os.Environment;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.txt.readerlibrary.db.BookList;
 import com.txt.readerlibrary.util.Fileutil;
 import com.txt.readerlibrary.util.PageFactory;
 import com.txt.readerlibrary.utils.DownLoadFile;
-import com.txt.readerlibrary.utils.LogUtils;
+import com.txt.readerlibrary.utils.TxtLogUtils;
 
 import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,17 +85,17 @@ public class TxtReader{
 
     private void setPath(final String url, final Activity mContext ){
         bookLists = DataSupport.findAll(BookList.class); //从数据库中查找所有booklist数据
-        LogUtils.D("bookLists--->"+bookLists.toString());
+        TxtLogUtils.D("bookLists--->"+bookLists.toString());
         if (bookLists!=null&&bookLists.size()>0){
             for (int i=0;i<bookLists.size();i++){
                 if (url.equals(bookLists.get(i).getBookpath())){
                     File file=new File(bookLists.get(i).getBookpath());
                     if (file.exists()){
-                        LogUtils.D("存在路径，打开已存在的书");
+                        TxtLogUtils.D("存在路径，打开已存在的书");
                         ReadActivity.openBook(bookLists.get(i),mContext);
                         return;
                     }else{
-                        LogUtils.D("存在路径,但文件不存在");
+                        TxtLogUtils.D("存在路径,但文件不存在");
 //                        noPath(bookLists.get(i).getBookpath(),mContext);
 //                        return;
                     }
@@ -148,7 +139,7 @@ public class TxtReader{
 
     private void setUrl(final String url, final Activity mContext ){
         bookLists = DataSupport.findAll(BookList.class); //从数据库中查找所有booklist数据
-        LogUtils.D("bookLists--->"+bookLists.toString());
+        TxtLogUtils.D("bookLists--->"+bookLists.toString());
         if (bookLists!=null&&bookLists.size()>0){
             for (int i=0;i<bookLists.size();i++){
                 if (url.equals(bookLists.get(i).getTxtUrl())){

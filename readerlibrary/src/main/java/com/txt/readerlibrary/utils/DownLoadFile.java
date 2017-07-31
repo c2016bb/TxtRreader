@@ -37,7 +37,7 @@ public class DownLoadFile {
     public static String getUrlName(String url){
         try {
             String output = URLDecoder.decode(url.substring(url.lastIndexOf("/")+1,url.lastIndexOf(".")), "UTF-8");
-            LogUtils.D("output--->"+output);
+            TxtLogUtils.D("output--->"+output);
             return  output;
         }catch (Exception e){
             e.printStackTrace();
@@ -49,7 +49,7 @@ public class DownLoadFile {
 
         setContext(context);
         setUrl(url);
-        filePath=AppConfig.getDownLoadBookPath();
+        filePath= TxtAppConfig.getDownLoadBookPath();
 
      String name=getUrlName(url);
         if (name==null){
@@ -58,7 +58,7 @@ public class DownLoadFile {
         }
       File  file=searchFileByFilePath(name+".txt",new File(filePath),url.substring(url.lastIndexOf(".")+1));
         if (file!=null){
-            LogUtils.D("存在file");
+            TxtLogUtils.D("存在file");
         callBack.getFilePath(file.getAbsolutePath());
             return;
         }
@@ -125,9 +125,9 @@ public class DownLoadFile {
                 long completeDownloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
 
                 if (completeDownloadId == downLoadId) {//下载完成
-                    LogUtils.D("下载完成"+"filePath()--->"+filePath);
+                    TxtLogUtils.D("下载完成"+"filePath()--->"+filePath);
                 File file=new File(filePath,DownLoadFile.url.substring(DownLoadFile.url.lastIndexOf("/")));
-                    LogUtils.D("file---->"+file.getAbsolutePath());
+                    TxtLogUtils.D("file---->"+file.getAbsolutePath());
 
                       if (file.exists()) {
                           callBack.getFilePath(file.getAbsolutePath());
@@ -158,7 +158,7 @@ public class DownLoadFile {
     public static void downloadPdf(Context context, String url, FilePathCallBack callBack) {
         setContext(context);
         setUrl(url);
-        File file=searchFileByFilePath(url.substring(url.lastIndexOf("/")+1),new File(AppConfig.getDownLoadBookPath()),url.substring(url.lastIndexOf("/")));
+        File file=searchFileByFilePath(url.substring(url.lastIndexOf("/")+1),new File(TxtAppConfig.getDownLoadBookPath()),url.substring(url.lastIndexOf("/")));
 
         if (file!=null){
                 //可进行数据操作
@@ -173,7 +173,7 @@ public class DownLoadFile {
             DownloadManager.Request request = new DownloadManager.Request(uri);
 
             //设置文件存放路径
-            request.setDestinationInExternalPublicDir(AppConfig.getDownLoadBookPath(), url.substring(url.lastIndexOf("/")));
+            request.setDestinationInExternalPublicDir(TxtAppConfig.getDownLoadBookPath(), url.substring(url.lastIndexOf("/")));
             downLoadId = downloadManager.enqueue(request);
 
             mBroadcastReceiver = new DownLoadBroadcastReceiver(callBack);
@@ -194,9 +194,9 @@ public class DownLoadFile {
     //mFile 代表名称在的路径
     //根据文件后缀名查找文件是否存在
     public static File searchFileByFilePath(String fileName, File mFile, final String s) {
-        LogUtils.D("fileName--->" + fileName);
-        LogUtils.D("mFile.getAbsolutePath()--->"+mFile.getAbsolutePath());
-        LogUtils.D("s--->"+s);
+        TxtLogUtils.D("fileName--->" + fileName);
+        TxtLogUtils.D("mFile.getAbsolutePath()--->"+mFile.getAbsolutePath());
+        TxtLogUtils.D("s--->"+s);
 
 //    /判断SD卡是否存在
         if (Environment.getExternalStorageState().equals(
@@ -213,9 +213,9 @@ public class DownLoadFile {
 
             if (files.length > 0) {
                 for (File file : files) {
-                    LogUtils.D("files--->" + file.getName());
+                    TxtLogUtils.D("files--->" + file.getName());
                     if (fileName.equals(file.getName())) {
-                        LogUtils.D("找到文件");
+                        TxtLogUtils.D("找到文件");
                         return file;
                     }
                 }
