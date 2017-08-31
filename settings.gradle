@@ -1,1 +1,1 @@
-include ':app', ':readerlibrary'
+include ':app', ':readerlibrary', ':baidutts', ':ttspluginlibray'

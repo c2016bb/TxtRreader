@@ -62,20 +62,20 @@
 
 
 
-        <!--<activity-->
-            <!--android:name="com.txt.readerlibrary.ReadActivity"-->
-            <!--android:label="@string/app_name"-->
-            <!--android:theme="@style/AppTheme.NoActionBar">-->
-            <!--<meta-data-->
-                <!--android:name="BaiDuTts_AppId"-->
-                <!--android:value="9926863" />-->
-            <!--<meta-data-->
-                <!--android:name="BaiDuTts_ApiKey"-->
-                <!--android:value="QHNP9sN1WIQ5YueG7hOK2Gbg" />-->
-            <!--<meta-data-->
-                <!--android:name="BaiDuTts_SecretKey"-->
-                <!--android:value="4019c6f96bb0929a34671820fcf04f29" />-->
-        <!--</activity>-->
+        <activity
+            android:name="com.txt.readerlibrary.ReadActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="BaiDuTts_AppId"
+                android:value="9926863" />
+            <meta-data
+                android:name="BaiDuTts_ApiKey"
+                android:value="QHNP9sN1WIQ5YueG7hOK2Gbg" />
+            <meta-data
+                android:name="BaiDuTts_SecretKey"
+                android:value="4019c6f96bb0929a34671820fcf04f29" />
+        </activity>
 
 
 

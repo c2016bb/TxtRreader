@@ -9,7 +9,9 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/baidutts" />
             <option value="$PROJECT_DIR$/readerlibrary" />
+            <option value="$PROJECT_DIR$/ttspluginlibray" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

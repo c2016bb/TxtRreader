@@ -3,6 +3,8 @@ package com.txt.readerlibrary;
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Environment;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.txt.readerlibrary.db.BookList;
@@ -15,6 +17,10 @@ import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,15 +58,23 @@ public class TxtReader{
 
 
 
+   public   String yuYinPath;
 
+    public  String getYuYinPath() {
+        return yuYinPath;
+    }
 
-
+    public  TxtReader setYuYinPath(String yuYinPath) {
+        this.yuYinPath = yuYinPath;
+        return  this;
+    }
 
     private void init(Context context){
         this.context=context;
         LitePal.initialize(context);
         Config.createConfig(context);
         PageFactory.createPageFactory(context);
+//        initialEnv();
     }
 
 //
@@ -232,7 +246,5 @@ public class TxtReader{
 //            Toast.makeText(FileActivity.this, msg, Toast.LENGTH_SHORT).show();
         }
     }
-
-
 
 }

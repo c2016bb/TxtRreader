@@ -56,21 +56,22 @@ public class BookUtil {
     public synchronized void openBook(BookList bookList) throws IOException {
         this.bookList = bookList;
         //如果当前缓存不是要打开的书本就缓存书本同时删除缓存
-
-        if (bookUrl == null || !bookUrl.equals(bookList.getTxtUrl())) { //当 没有加载过书本或现在加载的书本与现有书本不同时
-            cleanCacheFile(); //清除缓存的文件
-            if (bookList.isNetUrl()) {
+        if (bookList.isNetUrl()){//从网络打开图书
+            if (bookUrl == null || !bookUrl.equals(bookList.getTxtUrl())) { //当 没有加载过书本或现在加载的书本与现有书本不同时
+                cleanCacheFile(); //清除缓存的文件
                 this.bookUrl = bookList.getTxtUrl();//获取书本的路径
                 bookName = DownLoadFile.getUrlName(bookList.getTxtUrl());
 //                    FileUtils.getFileName(bookPath);
-
 //            InputStreamTask task=new InputStreamTask();
 //            task.execute(bookUrl);
                 InputStream is = FileUtils.getUrlStream(bookUrl);
                 if (is != null) {
                     cacheBookUrl(is);//缓存图书
                 }
-            }else{
+            }
+        }else{
+            if (bookPath == null || !bookPath.equals(bookList.getBookpath())) { //当 没有加载过书本或现在加载的书本与现有书本不同时
+                cleanCacheFile(); //清除缓存的文件
                 this.bookPath = bookList.getBookpath();
                 bookName = FileUtils.getFileName(bookPath);
                 cacheBook();

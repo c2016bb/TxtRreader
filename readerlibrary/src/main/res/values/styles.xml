@@ -44,9 +44,8 @@
     <style name="text_style">
         <item name="android:textSize">15sp</item>
         <item name="android:textColor">#FFFFFF</item>
-        <item name="android:textStyle">bold</item>
     </style>
-
+    <!--<item name="android:textStyle">bold</item>-->
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

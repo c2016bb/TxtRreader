@@ -3,8 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/baidutts/baidutts.iml" filepath="$PROJECT_DIR$/baidutts/baidutts.iml" />
       <module fileurl="file://$PROJECT_DIR$/readerlibrary/readerlibrary.iml" filepath="$PROJECT_DIR$/readerlibrary/readerlibrary.iml" />
       <module fileurl="file://$PROJECT_DIR$/treader-master.iml" filepath="$PROJECT_DIR$/treader-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ttspluginlibray/ttspluginlibray.iml" filepath="$PROJECT_DIR$/ttspluginlibray/ttspluginlibray.iml" />
     </modules>
   </component>
 </project>
