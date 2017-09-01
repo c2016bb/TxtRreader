@@ -59,11 +59,22 @@ public class TxtReader{
 
 
    public   String yuYinPath;
+   public  String yuyinUrl;
 
+    public String getYuyinUrl() {
+        return yuyinUrl;
+    }
+
+    public TxtReader setYuyinUrl(String yuyinUrl) {
+        this.yuyinUrl = yuyinUrl;
+        return  this;
+    }
+    @Deprecated
     public  String getYuYinPath() {
         return yuYinPath;
     }
 
+    @Deprecated
     public  TxtReader setYuYinPath(String yuYinPath) {
         this.yuYinPath = yuYinPath;
         return  this;
@@ -92,7 +103,16 @@ public class TxtReader{
 
     List<BookList>bookLists;
 
+  public static   String appId;
+  public  static   String appKey;
+  public static   String appSecreKey;
 
+    public  TxtReader setYuyinKey(String yyAppId,String yyAppKey,String yyAppSecreKey){
+        appId=yyAppId;
+        appKey=yyAppKey;
+        appSecreKey=yyAppSecreKey;
+        return this;
+    }
     public  void openBookByFilePath(String filePath,Activity mContext ){
         setPath(filePath,mContext);
     }

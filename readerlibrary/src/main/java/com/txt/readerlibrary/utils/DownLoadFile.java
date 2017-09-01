@@ -5,8 +5,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -20,12 +24,12 @@ public class DownLoadFile {
     public static long downLoadId;
     private static Context context;
 
-   private static String filePath;
+   public static String filePath=TxtAppConfig.YUYINPATH;
 
     public  interface   FilePathCallBack{
 
         void getFilePath(String path);
-
+        void downloadProgress(int progress);
     }
 
     public static void setContext(Context context) {
@@ -45,32 +49,51 @@ public class DownLoadFile {
         return null;
     }
 
-    public static void downloadFile(Context context, String url, FilePathCallBack callBack) {
+    public static void cancelDownLoad(){
+      downloadManager.remove(downLoadId);
+    }
 
+    public  static  String fileName;
+  static Handler  handler=new Handler(){
+       @Override
+       public void handleMessage(Message msg) {
+            mCallBack.downloadProgress((int)msg.what);
+       }
+   };
+    public  static FilePathCallBack mCallBack;
+  public static DownloadManager downloadManager;
+    public  static DownloadManager.Request request;
+
+//    public static  DownloadObserver observer;
+    public static void downloadFile(Context context, String url, FilePathCallBack callBack) {
         setContext(context);
         setUrl(url);
-        filePath= TxtAppConfig.getDownLoadBookPath();
+       mCallBack=callBack;
+        filePath=context.getCacheDir().getAbsolutePath()+"/"+filePath;
+     fileName=url.substring(url.lastIndexOf("/")+1);
 
-     String name=getUrlName(url);
-        if (name==null){
-
-            return;
-        }
-      File  file=searchFileByFilePath(name+".txt",new File(filePath),url.substring(url.lastIndexOf(".")+1));
-        if (file!=null){
-            TxtLogUtils.D("存在file");
-        callBack.getFilePath(file.getAbsolutePath());
-            return;
-        }
+//      File  file=searchFileByFilePath(name+".txt",new File(filePath),url.substring(url.lastIndexOf(".")+1));
+//        if (file!=null){
+//            TxtLogUtils.D("存在file");
+//        callBack.getFilePath(file.getAbsolutePath());
+//            return;
+//        }
         try {
-            DownloadManager downloadManager;
             downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-
             Uri uri = Uri.parse(url);
-            DownloadManager.Request request = new DownloadManager.Request(uri);
+            request = new DownloadManager.Request(uri);
+            // 通知栏中将出现的内容
+//            request.setTitle("百度语音下载");
+//            request.setDescription("下载一个大文件");
+            // 下载过程和下载完成后通知栏有通知消息。
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE | DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+
+//            observer=new DownloadObserver(handler,context,downloadManager);
+
+//            context.getContentResolver().registerContentObserver(Uri.parse("content://downloads/my_downloads"), true, observer);
 
             //可使用部分
-//            // 仅允许在WIFI连接情况下下载
+            // 仅允许在WIFI连接情况下下载
 //            request.setAllowedNetworkTypes(Request.NETWORK_WIFI);
 //            /**设置漫游状态下是否可以下载*/
 //            request.setAllowedOverRoaming(false);
@@ -90,8 +113,10 @@ public class DownLoadFile {
 
 
             //设置文件存放路径
-            request.setDestinationInExternalPublicDir(filePath, url.substring(url.lastIndexOf("/")));
+            request.setDestinationInExternalPublicDir(filePath, url.substring(url.lastIndexOf("/")+1));
+
             downLoadId = downloadManager.enqueue(request);
+//            observer.setDownId(downLoadId);
 
             mBroadcastReceiver = new DownLoadBroadcastReceiver(callBack);
             IntentFilter intentFilter = new IntentFilter();
@@ -108,32 +133,30 @@ public class DownLoadFile {
     public static void unregister() {
         if (mBroadcastReceiver != null) {
             context.unregisterReceiver(mBroadcastReceiver);
+
             mBroadcastReceiver=null;
         }
     }
 
+    private static final String TAG = "cc";
     private static class DownLoadBroadcastReceiver extends BroadcastReceiver {
      private  FilePathCallBack callBack;
-
         public DownLoadBroadcastReceiver(FilePathCallBack callBack) {
             this.callBack = callBack;
         }
-
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "onReceive: "+intent);
             if (DownloadManager.ACTION_DOWNLOAD_COMPLETE.equals(intent.getAction())) {
                 long completeDownloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
-
                 if (completeDownloadId == downLoadId) {//下载完成
-                    TxtLogUtils.D("下载完成"+"filePath()--->"+filePath);
-                File file=new File(filePath,DownLoadFile.url.substring(DownLoadFile.url.lastIndexOf("/")));
-                    TxtLogUtils.D("file---->"+file.getAbsolutePath());
-
-                      if (file.exists()) {
-                          callBack.getFilePath(file.getAbsolutePath());
-                      }else{
-                          callBack.getFilePath(null);
-                      }
+                    String filepath=Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+filePath+"/"+fileName;
+//                  observer.setDownLoading(false);
+                    Log.d(TAG, "filePath---->"+filepath);
+                    File file=new File(filepath);
+                    if (file.exists()) {
+                        callBack.getFilePath(file.getAbsolutePath());
+                    }
                 }
                 unregister();
             }
@@ -154,39 +177,6 @@ public class DownLoadFile {
     public String mAbsoluteFilePath;
 
 
-    //下载图书
-    public static void downloadPdf(Context context, String url, FilePathCallBack callBack) {
-        setContext(context);
-        setUrl(url);
-        File file=searchFileByFilePath(url.substring(url.lastIndexOf("/")+1),new File(TxtAppConfig.getDownLoadBookPath()),url.substring(url.lastIndexOf("/")));
-
-        if (file!=null){
-                //可进行数据操作
-            return;
-        }
-
-        try {
-            DownloadManager downloadManager;
-            downloadManager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-
-            Uri uri = Uri.parse(url);
-            DownloadManager.Request request = new DownloadManager.Request(uri);
-
-            //设置文件存放路径
-            request.setDestinationInExternalPublicDir(TxtAppConfig.getDownLoadBookPath(), url.substring(url.lastIndexOf("/")));
-            downLoadId = downloadManager.enqueue(request);
-
-            mBroadcastReceiver = new DownLoadBroadcastReceiver(callBack);
-            IntentFilter intentFilter = new IntentFilter();
-            intentFilter.addAction(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
-            context.registerReceiver(mBroadcastReceiver, intentFilter);//注册来电监听
-//            LogUtils.D("reference" + reference);
-//            String filePath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS) + "/" + fileName;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
 
 
 //       s 代表后缀名

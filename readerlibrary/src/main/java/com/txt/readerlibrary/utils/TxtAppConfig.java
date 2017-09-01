@@ -1,5 +1,6 @@
 package com.txt.readerlibrary.utils;
 
+import android.content.Context;
 import android.os.Environment;
 
 import java.io.File;
@@ -9,9 +10,9 @@ import java.io.File;
  */
 
 public class TxtAppConfig {
-    public static String getDownLoadBookPath() {
+    public static String getDownLoadBookPath(Context context) {
 
-        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/txtreader/DownLoad/";
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/"+context.getCacheDir().getAbsolutePath()+"/BookDownLoad/";
 //       String path= "/storage/emulated/0/cache/txtreader/DownLoad/book";
         File file = new File(path);
         if (!file.exists()) {
@@ -19,4 +20,6 @@ public class TxtAppConfig {
         }
         return path;
     }
+    public static  String YUYINPATH="yupinPlugin";
+
 }

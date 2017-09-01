@@ -6,6 +6,7 @@
 package com.txt.readerlibrary;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,19 +21,25 @@ import android.database.SQLException;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Build.VERSION;
 import android.support.design.widget.AppBarLayout;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.WindowManager.LayoutParams;
@@ -64,6 +71,8 @@ import com.txt.readerlibrary.dialog.SettingDialog.SettingListener;
 import com.txt.readerlibrary.util.BrightnessUtil;
 import com.txt.readerlibrary.util.PageFactory;
 import com.txt.readerlibrary.util.PageFactory.PageEvent;
+import com.txt.readerlibrary.utils.DownLoadFile;
+import com.txt.readerlibrary.utils.TxtAppConfig;
 import com.txt.readerlibrary.view.PageWidget;
 import com.txt.readerlibrary.view.PageWidget.TouchListener;
 import com.txtreader.ttspluginlibray.IHostInterface;
@@ -253,7 +262,7 @@ public class ReadActivity extends BaseLibrayActivity {
                      int progress=seekBar.getProgress();
                 Log.d(TAG, "progress---->"+progress);
                 if (hostInterface!=null){
-                    hostInterface.setPitch(progress/10+"");
+                    hostInterface.setSpeed(progress/10+"");
                 }
             }
         });
@@ -458,11 +467,54 @@ public class ReadActivity extends BaseLibrayActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+    Dialog dialog;
+    public void show(){
+        dialog = new Dialog(this,R.style.ActionSheetDialogStyle);
+        //填充对话框的布局
+        View   inflate = LayoutInflater.from(this).inflate(layout.dialog_yuyin, null);
+     final    TextView tv=(TextView) inflate.findViewById(id.yuyin_download_tv);
+        tv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DownLoadFile.downloadFile(ReadActivity.this, yuYinUrl, new DownLoadFile.FilePathCallBack() {
+                    @Override
+                    public void getFilePath(String path) {
+                        Log.d(TAG, "path---->"+path);
+                       tv.setText("下载完成");
+                        YUYINAPKPATH=path;
+                        createClassLoader();
+                    }
+
+                    @Override
+                    public void downloadProgress(int progress) {
+                         tv.setText("下载"+progress+"%");
+                    }
+                });
+            }
+        });
+        //将布局设置给Dialog
+        dialog.setContentView(inflate);
+        //获取当前Activity所在的窗体
+        Window dialogWindow = dialog.getWindow();
+        //设置Dialog从窗体底部弹出
+        dialogWindow.setGravity( Gravity.BOTTOM);
+        //获得窗体的属性
+        WindowManager.LayoutParams lp = dialogWindow.getAttributes();
+        lp.height= ViewGroup.LayoutParams.WRAP_CONTENT;
+        lp.width= LinearLayout.LayoutParams.MATCH_PARENT;
+//        lp.y = 30;//设置Dialog距离底部的距离
+//       将属性设置给窗体
+        dialogWindow.setAttributes(lp);
+        dialog.show();//显示对话框
+    }
+
+
+
+
     public boolean onCreateOptionsMenu(Menu menu) {
         this.getMenuInflater().inflate(R.menu.read, menu);
         return true;
     }
-
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.action_add_bookmark) {
@@ -496,27 +548,31 @@ public class ReadActivity extends BaseLibrayActivity {
                 }
             }
         } else if(id ==R.id.action_read_book) {
-            if (hostInterface==null) {
-                getDeclaredMethod();
-            }else{
-                hostInterface.speak(this.pageFactory.getCurrentPage().getLineToString());
+            Log.d(TAG, "YUYINAPKPATH---->"+YUYINAPKPATH);
+            if (YUYINAPKPATH==null){
+                yuYinUrl=TxtReader.getTxtReader().getYuyinUrl();
+                Log.d(TAG, "yuYinUrl---->"+yuYinUrl);
+                if (yuYinUrl!=null){
+                    YUYINAPKPATH = Environment.getExternalStorageDirectory().getAbsolutePath() + getCacheDir().getAbsolutePath() +"/"+ TxtAppConfig.YUYINPATH+ yuYinUrl.substring(yuYinUrl.lastIndexOf("/"));
+                    Log.d(TAG, "YUYINAPKPATH---->"+YUYINAPKPATH);
+                    File file=new File(YUYINAPKPATH);
+                    Log.d(TAG, "file--->"+file.getAbsolutePath());
+                    if (file.exists()) {
+                        Log.d(TAG, "文件存在");
+                        createClassLoader();
+                    }else{
+                        YUYINAPKPATH=null;
+                        Log.d(TAG, "文件不存在");
+                        show();
+                    }
+                }
+            }else {
+                if (hostInterface==null) {
+                    getDeclaredMethod();
+                }else{
+                    hostInterface.speak(this.pageFactory.getCurrentPage().getLineToString());
+                }
             }
-
-//            this.initialTts();
-//            if(this.mSpeechSynthesizer != null) {
-//                this.mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_VOLUME, "5");
-//                this.mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_SPEED, "5");
-//                this.mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_PITCH, "5");
-//                this.mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_SPEAKER, "0");
-//                this.mSpeechSynthesizer.setParam(SpeechSynthesizer.PARAM_VOCODER_OPTIM_LEVEL, "0");
-//                int intent1 = this.mSpeechSynthesizer.speak(this.pageFactory.getCurrentPage().getLineToString());
-//                if(intent1 < 0) {
-//                    Log.e("ReadActivity", "error,please look up error code in doc or URL:http://yuyin.baidu.com/docs/tts/122 ");
-//                } else {
-//                    this.hideReadSetting();
-//                    this.isSpeaking = true;
-//                }
-//            }
         } else if(id == R.id.action_read_book) {
             Intent intent2 = new Intent(this, FileChooserActivity.class);
             this.startActivity(intent2);
@@ -531,24 +587,48 @@ public class ReadActivity extends BaseLibrayActivity {
 
 
     String YUYINAPKPATH = TxtReader.getTxtReader().getYuYinPath();
+    String yuYinUrl;
     DexClassLoader mClassLoader;
 
 
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        new Thread(){
+    private void createClassLoader(){
+        AsyncTask<String,String,Boolean>task=new AsyncTask<String, String, Boolean>() {
             @Override
-            public void run() {
+            protected Boolean doInBackground(String... params) {
                 //创建一个属于我们自己插件的ClassLoader，我们分析过只能使用DexClassLoader
-                String cachePath = ReadActivity.this.getCacheDir().getAbsolutePath();
+                String cachePath = ReadActivity.this.getCacheDir().getAbsolutePath()+"/yyCachePlugin";
+                Log.d(TAG, "cachePath---->"+cachePath);
+                File file=new File(cachePath);
+                if (!file.exists()){
+                    file.mkdirs();
+                }
                 File file1= new File(YUYINAPKPATH);
                 if (file1.exists()){
                     mClassLoader = new DexClassLoader(YUYINAPKPATH, cachePath,cachePath, getClassLoader());
+                    if (mClassLoader!=null){
+                        return true;
+                    }
                 }else{
                     Log.i("cc","文件1不存在");
                 }
+                return false;
             }
-        }.start();
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+              if (aBoolean){
+                  getDeclaredMethod();
+              }else{
+                  YUYINAPKPATH=null;
+              }
+            }
+        };
+      task.execute();
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+
         super.attachBaseContext(newBase);
     }
 
@@ -765,35 +845,44 @@ public  class PluginsIml implements IPluginInterface{
     }
 
     private void getActivityMetaData() {
-        try {
-            ActivityInfo e = this.getPackageManager().getActivityInfo(getComponentName(), PackageManager.GET_META_DATA);
-            this.appId = e.metaData.getInt("BaiDuTts_AppId") + "";
-            Log.i("cc", "appId--->" + this.appId);
-            this.appKey = e.metaData.getString("BaiDuTts_ApiKey");
-            this.appSecreKey = e.metaData.getString("BaiDuTts_SecretKey");
-        } catch (Exception var2) {
-            var2.printStackTrace();
-        }
+        appId=TxtReader.getTxtReader().appId;
+        appKey=TxtReader.getTxtReader().appKey;
+        appSecreKey=TxtReader.getTxtReader().appSecreKey;
+//        try {
+//            ActivityInfo e = this.getPackageManager().getActivityInfo(getComponentName(), PackageManager.GET_META_DATA);
+//            this.appId = e.metaData.getInt("BaiDuTts_AppId") + "";
+//            Log.i("cc", "appId--->" + this.appId);
+//            this.appKey = e.metaData.getString("BaiDuTts_ApiKey");
+//            this.appSecreKey = e.metaData.getString("BaiDuTts_SecretKey");
+//        } catch (Exception var2) {
+//            var2.printStackTrace();
+//        }
 
     }
 
 
     public void onSynthesizeStart(String s) {
+        Log.d(TAG, "onSynthesizeStart:s-->"+s);
     }
 
     public void onSynthesizeDataArrived(String utteranceId, byte[] data, int progress) {
+        Log.d(TAG, "onSynthesizeDataArrived: utteranceId->"+utteranceId+"data--->"+data+"progress-->"+progress);
     }
 
     public void onSynthesizeFinish(String utteranceId) {
+        Log.d(TAG, "onSynthesizeFinish:utteranceId--> +utteranceId");
     }
 
     public void onSpeechStart(String utteranceId) {
+        Log.d(TAG, "onSpeechStart: utteranceId"+utteranceId);
     }
 
     public void onSpeechProgressChanged(String utteranceId, int progress) {
+        Log.d(TAG, "onSpeechProgressChanged: utteranceId"+utteranceId+"progress---->"+progress);
     }
 
     public void onSpeechFinish(String utteranceId) {
+        Log.d(TAG, "onSpeechFinish: utteranceId--->"+utteranceId);
         this.pageFactory.nextPage();
         if(this.pageFactory.islastPage()) {
             this.isSpeaking = false;
@@ -809,6 +898,7 @@ public  class PluginsIml implements IPluginInterface{
         hostInterface.stop();
         this.isSpeaking = false;
         Log.e("ReadActivity", error);
+
     }
 
     protected void onCreate(Bundle savedInstanceState) {
