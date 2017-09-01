@@ -41,7 +41,6 @@ public class TxtReader{
                 LitePal.initialize(context);
         Config.createConfig(context);
         PageFactory.createPageFactory(context);
-
         init(context);
     }
 
