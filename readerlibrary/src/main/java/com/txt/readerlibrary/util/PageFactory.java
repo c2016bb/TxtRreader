@@ -144,6 +144,7 @@ public class PageFactory {
     private boolean isNetUrl;
     private  String txtUrl;
 
+     private  String realBookName;
 
     private PageEvent mPageEvent;
 
@@ -379,7 +380,7 @@ public class PageFactory {
         rect2.bottom = rect2.bottom - poleHeight/4;
         c.drawRect(rect2, mBatterryPaint);
         //画书名
-        c.drawText(CommonUtil.subString(bookName,12), marginWidth ,statusMarginBottom + mBatterryFontSize, mBatterryPaint);
+        c.drawText(CommonUtil.subString(realBookName==null?bookName:realBookName,12), marginWidth ,statusMarginBottom + mBatterryFontSize, mBatterryPaint);
         //画章
         if (getDirectoryList().size() > 0) {
             String charterName = CommonUtil.subString(getDirectoryList().get(currentCharter).getBookCatalogue(),12);
@@ -449,6 +450,8 @@ public class PageFactory {
 //        bookPath = bookList.getBookpath();
         this.isNetUrl=bookList.isNetUrl();
 
+        realBookName=bookList.getRealName();
+
         if (bookList.isNetUrl()) {
             this.txtUrl=bookList.getTxtUrl();
             bookName = DownLoadFile.getUrlName(bookList.getTxtUrl());
@@ -474,7 +477,7 @@ public class PageFactory {
         @Override
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
-            TxtLogUtils.D(isCancelled() + "");
+            TxtLogUtils.D(isCancelled() + "---------------------"+result);
             if (isCancelled()){
                 return;
             }

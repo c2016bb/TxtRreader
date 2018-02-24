@@ -31,7 +31,7 @@ import java.util.List;
 public class TxtReader{
     public static Context context;
     public  static  TxtReader txtReader;
-
+    private  String realBookName;
     public static TxtReader getTxtReader() {
         return txtReader;
     }
@@ -170,6 +170,11 @@ public class TxtReader{
         setUrl(url,mContext);
     }
 
+    public  void openBookByUrl(String url,Activity mContext,String realBookName ){
+        this.realBookName=realBookName;
+        openBookByUrl(url,mContext);
+    }
+
     private void setUrl(final String url, final Activity mContext ){
         bookLists = DataSupport.findAll(BookList.class); //从数据库中查找所有booklist数据
         TxtLogUtils.D("bookLists--->"+bookLists.toString());
@@ -201,6 +206,11 @@ public class TxtReader{
         bookList = new BookList();
         String bookName = Fileutil.getFileNameNoEx(DownLoadFile.getUrlName(url));
         bookList.setBookname(bookName);
+
+         if (realBookName!=null){
+             bookList.setRealName(realBookName);
+         }
+
         bookList.setNetUrl(true);
 //        bookList.setBookpath(file.getAbsolutePath());
         bookList.setTxtUrl(url);
