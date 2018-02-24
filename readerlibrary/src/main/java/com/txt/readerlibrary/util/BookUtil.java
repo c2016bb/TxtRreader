@@ -27,11 +27,11 @@ import java.util.List;
  * Created by Administrator on 2016/8/11 0011.
  */
 public class BookUtil {
-    private static final String TAG  = "BokkUtil";
+    private static final String TAG  = "BookUtil";
 
     private static final String cachedPath = Environment.getExternalStorageDirectory() + "/treader/";//每个30000字符缓存目录
     //存储的字符数
-    public static final int cachedSize = 30000;
+    public static final int cachedSize = 1024*5;
 //    protected final ArrayList<WeakReference<char[]>> myArray = new ArrayList<>();
 
     protected final ArrayList<Cache> myArray = new ArrayList<>();//每 30000字符缓存处
@@ -65,6 +65,7 @@ public class BookUtil {
 //            InputStreamTask task=new InputStreamTask();
 //            task.execute(bookUrl);
                 InputStream is = FileUtils.getUrlStream(bookUrl);
+                TxtLogUtils.D("is-----"+is);
                 if (is != null) {
                     cacheBookUrl(is);//缓存图书
                 }
