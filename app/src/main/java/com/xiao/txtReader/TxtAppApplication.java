@@ -24,7 +24,7 @@ public class TxtAppApplication extends LitePalApplication {
     public void onCreate() {
         super.onCreate();
 //        initialEnv();
-        TxtReader.initlize(this);
+//        TxtReader.initlize(this);
     }
 
 }

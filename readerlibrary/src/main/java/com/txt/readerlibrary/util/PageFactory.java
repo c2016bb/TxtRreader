@@ -879,8 +879,9 @@ public class PageFactory {
         return txtUrl;
     }
 
-
-
+    public String getRealBookName() {
+        return realBookName;
+    }
 
     //是否是第一页
     public boolean isfirstPage() {

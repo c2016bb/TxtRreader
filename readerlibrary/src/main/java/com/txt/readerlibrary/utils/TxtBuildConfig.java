@@ -5,7 +5,8 @@ package com.txt.readerlibrary.utils;
  */
 
 public class TxtBuildConfig {
-    public static final boolean DEBUG = Boolean.parseBoolean("true");
+
+    public static final boolean DEBUG = Boolean.parseBoolean("false");//false  or true
     public static final String APPLICATION_ID = "com.first.ahlib";
     public static final String BUILD_TYPE = "debug";
     public static final String FLAVOR = "";

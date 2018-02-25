@@ -73,10 +73,11 @@ public class MarkActivity extends BaseLibrayActivity {
             }
         });
         if (getSupportActionBar() != null) {
+
             if (isNetUrl) {
-                getSupportActionBar().setTitle(FileUtils.getFileName(pageFactory.getTxtUrl()));
+                getSupportActionBar().setTitle(pageFactory.getRealBookName()!=null?pageFactory.getRealBookName():FileUtils.getFileName(pageFactory.getTxtUrl()));
             }else{
-                getSupportActionBar().setTitle(FileUtils.getFileName(pageFactory.getBookPath()));
+                getSupportActionBar().setTitle(pageFactory.getRealBookName()!=null?pageFactory.getRealBookName():FileUtils.getFileName(pageFactory.getBookPath()));
             }
         }
 

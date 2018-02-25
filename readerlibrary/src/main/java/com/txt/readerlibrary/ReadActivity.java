@@ -73,6 +73,7 @@ import com.txt.readerlibrary.util.PageFactory;
 import com.txt.readerlibrary.util.PageFactory.PageEvent;
 import com.txt.readerlibrary.utils.DownLoadFile;
 import com.txt.readerlibrary.utils.TxtAppConfig;
+import com.txt.readerlibrary.utils.TxtLogUtils;
 import com.txt.readerlibrary.view.PageWidget;
 import com.txt.readerlibrary.view.PageWidget.TouchListener;
 import com.txtreader.ttspluginlibray.IHostInterface;
@@ -269,8 +270,12 @@ public class ReadActivity extends BaseLibrayActivity {
 
     }
 
+    public void setb(boolean sd){
+
+    }
     protected void initData() {
         this.initView();
+
         if(VERSION.SDK_INT >= 14 && VERSION.SDK_INT < 19) {
             this.bookpage.setLayerType(1, (Paint)null);
         }
@@ -551,12 +556,12 @@ public class ReadActivity extends BaseLibrayActivity {
             Log.d(TAG, "YUYINAPKPATH---->"+YUYINAPKPATH);
             if (YUYINAPKPATH==null){
                 yuYinUrl=TxtReader.getTxtReader().getYuyinUrl();
-                Log.d(TAG, "yuYinUrl---->"+yuYinUrl);
+                TxtLogUtils.D("yuYinUrl---->"+yuYinUrl);
                 if (yuYinUrl!=null){
                     YUYINAPKPATH = Environment.getExternalStorageDirectory().getAbsolutePath() + getCacheDir().getAbsolutePath() +"/"+ TxtAppConfig.YUYINPATH+ yuYinUrl.substring(yuYinUrl.lastIndexOf("/"));
-                    Log.d(TAG, "YUYINAPKPATH---->"+YUYINAPKPATH);
+                    TxtLogUtils.D("YUYINAPKPATH---->"+YUYINAPKPATH);
                     File file=new File(YUYINAPKPATH);
-                    Log.d(TAG, "file--->"+file.getAbsolutePath());
+                    TxtLogUtils.D("file--->"+file.getAbsolutePath());
                     if (file.exists()) {
                         Log.d(TAG, "文件存在");
                         createClassLoader();
@@ -597,7 +602,7 @@ public class ReadActivity extends BaseLibrayActivity {
             protected Boolean doInBackground(String... params) {
                 //创建一个属于我们自己插件的ClassLoader，我们分析过只能使用DexClassLoader
                 String cachePath = ReadActivity.this.getCacheDir().getAbsolutePath()+"/yyCachePlugin";
-                Log.d(TAG, "cachePath---->"+cachePath);
+                TxtLogUtils.D( "cachePath---->"+cachePath);
                 File file=new File(cachePath);
                 if (!file.exists()){
                     file.mkdirs();
@@ -644,7 +649,7 @@ private void getDeclaredMethod(){
 //    appSecreKey="4019c6f96bb0929a34671820fcf04f29";
     getActivityMetaData();
 
-    Log.d(TAG, "appId---->"+appId);
+    TxtLogUtils.D("appId---->"+appId);
     try {
         //创建我们自己的Resource
 
@@ -659,17 +664,17 @@ private void getDeclaredMethod(){
         ensureStringBlocks.invoke(assetManager);
 
         Resources supResource = getResources();
-        Log.e(TAG, "supResource = " + supResource);
+        TxtLogUtils.D("supResource = " + supResource);
         newResource = new Resources(assetManager, supResource.getDisplayMetrics(), supResource.getConfiguration());
-        Log.d(TAG, "设置 getResource = " + getResources());
-        Log.d(TAG, "设置 getAssets() = " + getAssets());
+        TxtLogUtils.D("设置 getResource = " + getResources());
+        TxtLogUtils.D("设置 getAssets() = " + getAssets());
 //        mTheme = newResource.newTheme();
 //        mTheme.setTo(super.getTheme());
 
-        Log.d(TAG, "mClassLoader----->"+mClassLoader);
+        TxtLogUtils.D("mClassLoader----->"+mClassLoader);
             Class clazz=mClassLoader.loadClass(dopage);
             IPluginInterface plu=new PluginsIml();
-        Log.d(TAG, "clazz---->"+clazz);
+        TxtLogUtils.D("clazz---->"+clazz);
 
             if (clazz!=null){
                 Method method=clazz.getMethod("setContext",Context.class,AssetManager.class,Resources.class,IPluginInterface.class);
@@ -678,7 +683,7 @@ private void getDeclaredMethod(){
             }
 
     } catch (Exception e) {
-        Log.e(TAG, "走了我的callActivityOnCreate 错了 = " + e.getMessage());
+        TxtLogUtils.D("走了我的callActivityOnCreate 错了 = " + e.getMessage());
     }
 }
 
@@ -690,7 +695,7 @@ public  class PluginsIml implements IPluginInterface{
         ReadActivity.this.hostInterface=hostInterface;
         hostInterface.initPlugin(appId,appKey,appSecreKey);
         hostInterface.speak(pageFactory.getCurrentPage().getLineToString());
-        Log.d(TAG, "getPluginClass: hostInterface----->"+hostInterface);
+        TxtLogUtils.D("getPluginClass: hostInterface----->"+hostInterface);
     }
 
     @Override
@@ -730,6 +735,7 @@ public  class PluginsIml implements IPluginInterface{
 
     @Override
     public void speekResult(Boolean result) {
+        TxtLogUtils.D("成功了");
         if (result){
             hideReadSetting();
            isSpeaking = true;
